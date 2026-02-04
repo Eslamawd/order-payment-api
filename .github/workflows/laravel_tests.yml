@@ -1,0 +1,57 @@
+name: Api Tests
+
+on:
+  push:
+    branches: ["main", "master"]
+    paths:
+      - "**.php"
+      - "app/**"
+      - "public/**"
+      - "resources/**"
+      - "config/**"
+      - "database/**"
+      - "routes/**"
+      - "tests/**"
+  pull_request:
+    branches: ["main", "master"]
+    paths:
+      - "**.php"
+      - "app/**"
+      - "public/**"
+      - "resources/**"
+      - "config/**"
+      - "database/**"
+      - "routes/**"
+      - "tests/**"
+
+jobs:
+  laravel-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: bcmath, curl, fileinfo, json, mbstring, pdo, sqlite, zip, tokenizer, xml, ctype, openssl, gd, mysqli
+          ini-values: post_max_size=256M, upload_max_filesize=256M
+          coverage: none
+
+      - name: Install Composer Dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Prepare Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=:memory:" >> .env
+
+      - name: Run Database Migrations
+        run: php artisan migrate --force
+
+      - name: Run Laravel Tests
+        # التعديل هنا ليتناسب مع Pest PHP المستخدم في مشروعك
+        run: ./vendor/bin/pest
