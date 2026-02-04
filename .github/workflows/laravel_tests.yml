@@ -54,4 +54,4 @@ jobs:
 
       - name: Run Laravel Tests
         # التعديل هنا ليتناسب مع Pest PHP المستخدم في مشروعك
-        run: ./vendor/bin/pest
+        run: php artisan test --verbose
